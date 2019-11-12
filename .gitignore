@@ -1,0 +1,6 @@
+.env
+docker_metrics_processor
+/.vscode
+/.idea
+input/
+output/

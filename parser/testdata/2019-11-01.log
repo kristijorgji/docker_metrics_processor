@@ -1,0 +1,25 @@
+2019-11-01T15:16:59+00:00
+CONTAINER ID        NAME                CPU %               MEM USAGE / LIMIT     MEM %               NET I/O             BLOCK I/O           PIDS
+0c783358576b        single-proxy        0.00%               2.723MiB / 1.953GiB   0.14%               2.5GB / 2.48GB      9.17MB / 0B         3
+3b1681f84c07        single-web          0.00%               31.96MiB / 1.953GiB   1.60%               109MB / 2.43GB      572MB / 32.8kB      9
+423306a17a71        single-api          0.01%               47.65MiB / 1.953GiB   2.38%               64.6MB / 33.6MB     7.29MB / 8.19kB     8
+2019-11-01T15:17:06+00:00
+CONTAINER ID        NAME                CPU %               MEM USAGE / LIMIT     MEM %               NET I/O             BLOCK I/O           PIDS
+0c783358576b        single-proxy        0.01%               2.723MiB / 1.953GiB   0.14%               2.5GB / 2.48GB      9.17MB / 0B         3
+3b1681f84c07        single-web          0.01%               31.96MiB / 1.953GiB   1.60%               109MB / 2.43GB      572MB / 32.8kB      9
+423306a17a71        single-api          0.00%               47.65MiB / 1.953GiB   2.38%               64.6MB / 33.6MB     7.29MB / 8.19kB     8
+2019-11-01T15:17:14+00:00
+CONTAINER ID        NAME                CPU %               MEM USAGE / LIMIT     MEM %               NET I/O             BLOCK I/O           PIDS
+0c783358576b        single-proxy        0.00%               2.723MiB / 1.953GiB   0.14%               2.5GB / 2.48GB      9.17MB / 0B         3
+3b1681f84c07        single-web          0.00%               31.96MiB / 1.953GiB   1.60%               109MB / 2.43GB      572MB / 32.8kB      9
+423306a17a71        single-api          0.01%               47.65MiB / 1.953GiB   2.38%               64.6MB / 33.6MB     7.29MB / 8.19kB     8
+2019-11-01T15:17:21+00:00
+CONTAINER ID        NAME                CPU %               MEM USAGE / LIMIT     MEM %               NET I/O             BLOCK I/O           PIDS
+0c783358576b        single-proxy        0.00%               2.723MiB / 1.953GiB   0.14%               2.5GB / 2.48GB      9.17MB / 0B         3
+3b1681f84c07        single-web          0.00%               31.96MiB / 1.953GiB   1.60%               109MB / 2.43GB      572MB / 32.8kB      9
+423306a17a71        single-api          0.00%               47.65MiB / 1.953GiB   2.38%               64.6MB / 33.6MB     7.29MB / 8.19kB     8
+2019-11-01T15:17:28+00:00
+CONTAINER ID        NAME                CPU %               MEM USAGE / LIMIT     MEM %               NET I/O             BLOCK I/O           PIDS
+0c783358576b        single-proxy        0.00%               2.723MiB / 1.953GiB   0.14%               2.5GB / 2.48GB      9.17MB / 0B         3
+3b1681f84c07        single-web          0.00%               31.96MiB / 1.953GiB   1.60%               109MB / 2.43GB      572MB / 32.8kB      9
+423306a17a71        single-api          0.00%               47.65MiB / 1.953GiB   2.38%               64.6MB / 33.6MB     7.29MB / 8.19kB     8
