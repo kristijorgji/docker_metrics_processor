@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"sync"
 
 	"../models"
 )
@@ -42,6 +43,8 @@ func (repository *MetricsRepository) Close() {
 	}
 }
 
+var mutex = &sync.Mutex{}
+
 // InsertBatch into mysql
 func (repository *MetricsRepository) InsertBatch(metrics []*models.ServiceMetrics) {
 	var buffer bytes.Buffer
@@ -67,6 +70,8 @@ func (repository *MetricsRepository) InsertBatch(metrics []*models.ServiceMetric
 		args = append(args, metric.MemoryPercentage)
 	}
 
+	mutex.Lock()
+
 	insertStatement, err := repository.db.Prepare(buffer.String())
 	if err != nil {
 		log.Panic(err.Error())
@@ -76,4 +81,6 @@ func (repository *MetricsRepository) InsertBatch(metrics []*models.ServiceMetric
 	if err != nil {
 		log.Panic(err.Error())
 	}
+
+	mutex.Unlock()
 }

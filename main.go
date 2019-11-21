@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"sync"
+	"syscall"
 	"time"
 
 	"./models"
@@ -30,6 +32,16 @@ func main() {
 		log.Printf("Execution took %s\n", time.Since(start))
 	}
 	defer bye()
+
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		bye()
+		os.Exit(0)
+	}()
+
+	log.Printf("Starting with Batch size %d, input path %s\n", batchSize, inputPath)
 
 	metricsRepository = &repositories.MetricsRepository{}
 	metricsRepository.Init()
@@ -60,16 +72,25 @@ func processLog(wg *sync.WaitGroup, path string) {
 	defer timeTrack(time.Now(), fmt.Sprintf("Finished processing %s\n", path))
 	defer wg.Done()
 
-	log.Printf("Started processing %s\n", path)
+	log.Printf("[%s] Started processing\n", path)
 	metrics := parser.Parse(path)
+	log.Printf("[%s] Parsed, will insert into storage\n", path)
 
 	var batch []*models.ServiceMetrics
-	for i := 0; i < len(metrics); i++ {
+	i := 0
+	for ; i < len(metrics); i++ {
 		batch = append(batch, &metrics[i])
 		if i != 0 && i%batchSize == 0 {
 			metricsRepository.InsertBatch(batch)
+			log.Printf("[%s] Inserted %d rows", path, batchSize)
 			batch = make([]*models.ServiceMetrics, 0)
 		}
+	}
+
+	if len(batch) > 0 {
+		metricsRepository.InsertBatch(batch)
+		log.Printf("[%s] Inserted %d rows", path, batchSize)
+		batch = nil
 	}
 }
 
