@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"strconv"
-	"sync"
 
 	"../models"
 )
@@ -43,44 +42,34 @@ func (repository *MetricsRepository) Close() {
 	}
 }
 
-var mutex = &sync.Mutex{}
-
 // InsertBatch into mysql
 func (repository *MetricsRepository) InsertBatch(metrics []*models.ServiceMetrics) {
 	var buffer bytes.Buffer
 	buffer.WriteString("INSERT INTO services VALUES")
 
-	var args []interface{}
-
 	beforeLastIndex := len(metrics) - 1
 	for i := 0; i < len(metrics); i++ {
 		metric := *metrics[i]
-
-		buffer.WriteString("( ?, ?, ?, ?, ?, ?, ? )")
+		buffer.WriteString(
+			fmt.Sprintf(
+				"('%s', '%s', '%s', %f, %f, %f, %f)",
+				metric.Datetime,
+				metric.ContainerID,
+				metric.ContainerName,
+				metric.CPUPercentage,
+				metric.MemoryUsageInMib,
+				metric.MemoryLimitInMib,
+				metric.MemoryPercentage,
+			),
+		)
 		if i < beforeLastIndex {
 			buffer.WriteString(",")
 		}
-
-		args = append(args, metric.Datetime)
-		args = append(args, metric.ContainerID)
-		args = append(args, metric.ContainerName)
-		args = append(args, metric.CPUPercentage)
-		args = append(args, metric.MemoryUsageInMib)
-		args = append(args, metric.MemoryLimitInMib)
-		args = append(args, metric.MemoryPercentage)
 	}
 
-	mutex.Lock()
-
-	insertStatement, err := repository.db.Prepare(buffer.String())
+	insert, err := repository.db.Query(buffer.String())
 	if err != nil {
 		log.Panic(err.Error())
 	}
-
-	_, err = insertStatement.Exec(args...)
-	if err != nil {
-		log.Panic(err.Error())
-	}
-
-	mutex.Unlock()
+	insert.Close()
 }
