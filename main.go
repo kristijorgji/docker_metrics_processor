@@ -22,6 +22,7 @@ const defaultBatchSize = 1000
 
 var batchSize int
 var inputPath string
+var shouldDeleteOnEnd bool = false
 
 var metricsRepository *repositories.MetricsRepository
 
@@ -41,7 +42,7 @@ func main() {
 		os.Exit(0)
 	}()
 
-	log.Printf("Starting with batch size of %d, input path %s\n", batchSize, inputPath)
+	log.Printf("Starting with batch size of %d, input path %s, shouldDeleteOnEnd %t\n", batchSize, inputPath, shouldDeleteOnEnd)
 
 	metricsRepository = &repositories.MetricsRepository{}
 	metricsRepository.Init()
@@ -68,8 +69,20 @@ func main() {
 
 	wg.Wait()
 
+	if shouldDeleteOnEnd {
+		log.Printf("Will delete log files")
+	}
+
 	totalInsertedRows := 0
-	for _, v := range insertedRowsPerUnitOfWork {
+	for filePath, v := range insertedRowsPerUnitOfWork {
+		if shouldDeleteOnEnd {
+			log.Printf("Deleted %s", filePath)
+			err := os.Remove(filePath)
+			if err != nil {
+				log.Print(err)
+			}
+
+		}
 		totalInsertedRows += v
 	}
 	log.Printf("Inserted total %d rows", totalInsertedRows)
@@ -116,6 +129,7 @@ func setupEnv() {
 		log.Panic("Error loading .env file")
 	}
 
+	flag.BoolVar(&shouldDeleteOnEnd, "deleteOnEnd", shouldDeleteOnEnd, "if set all logs will be deleted upon successful parsing")
 	batchSizeFlag := flag.Int("batchSize", defaultBatchSize, "the number of metrics to insert in storage in one batch")
 	flag.StringVar(&inputPath, "inputPath", "input/", "folder path where logs are located")
 	flag.Parse()
