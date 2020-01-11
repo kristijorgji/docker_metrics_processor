@@ -1,5 +1,6 @@
 .env
 docker_metrics_processor
+docker_metrics_processor.exe
 /.vscode
 /.idea
 input/
