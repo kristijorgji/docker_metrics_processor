@@ -45,7 +45,7 @@ func (repository *MetricsRepository) Close() {
 // InsertBatch into mysql
 func (repository *MetricsRepository) InsertBatch(metrics []*models.ServiceMetrics) {
 	var buffer bytes.Buffer
-	buffer.WriteString("INSERT INTO services VALUES")
+	buffer.WriteString("REPLACE INTO services VALUES")
 
 	beforeLastIndex := len(metrics) - 1
 	for i := 0; i < len(metrics); i++ {

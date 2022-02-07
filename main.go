@@ -19,12 +19,16 @@ import (
 )
 
 const defaultBatchSize = 1000
+const defaultMaxFilesInParallel = 10;
 
 var batchSize int
+var maxFilesInParallel int
 var inputPath string
 var shouldDeleteOnEnd bool = false
 
 var metricsRepository *repositories.MetricsRepository
+
+var filesBeingProcessed = 0
 
 func main() {
 	start := time.Now()
@@ -42,7 +46,7 @@ func main() {
 		os.Exit(0)
 	}()
 
-	log.Printf("Starting with batch size of %d, input path %s, shouldDeleteOnEnd %t\n", batchSize, inputPath, shouldDeleteOnEnd)
+	log.Printf("Starting with batch size of %d, processing max %d files in parallel, input path %s, shouldDeleteOnEnd %t\n", batchSize, maxFilesInParallel, inputPath, shouldDeleteOnEnd)
 
 	metricsRepository = &repositories.MetricsRepository{}
 	metricsRepository.Init()
@@ -57,7 +61,15 @@ func main() {
 				return err
 			}
 			if !info.IsDir() {
+				if filesBeingProcessed >= maxFilesInParallel {
+					wg.Wait();
+					filesBeingProcessed = 0;
+				} else {
+					filesBeingProcessed++
+				}
 				wg.Add(1)
+
+				log.Printf("Currently processing %d files in parallel\n", filesBeingProcessed)
 				go processLog(&wg, insertedRowsPerUnitOfWork, path)
 			}
 
@@ -69,20 +81,8 @@ func main() {
 
 	wg.Wait()
 
-	if shouldDeleteOnEnd {
-		log.Printf("Will delete log files")
-	}
-
 	totalInsertedRows := 0
-	for filePath, v := range insertedRowsPerUnitOfWork {
-		if shouldDeleteOnEnd {
-			log.Printf("Deleted %s", filePath)
-			err := os.Remove(filePath)
-			if err != nil {
-				log.Print(err)
-			}
-
-		}
+	for _, v := range insertedRowsPerUnitOfWork {
 		totalInsertedRows += v
 	}
 	log.Printf("Inserted total %d rows", totalInsertedRows)
@@ -121,6 +121,15 @@ func processLog(wg *sync.WaitGroup, insertedRowsPerUnitOfWork map[string]int, pa
 	log.Printf("[%s] Inserted total %d rows", path, totalInsertedRows)
 	insertedRowsPerUnitOfWork[path] = totalInsertedRows
 
+	if shouldDeleteOnEnd {
+		log.Printf("[%s] Deleting now the log file", path)
+		err := os.Remove(path)
+		if err != nil {
+			log.Print(err)
+		} else {
+			log.Printf("Deleted %s", path)
+		}
+	}
 }
 
 func setupEnv() {
@@ -131,6 +140,7 @@ func setupEnv() {
 
 	flag.BoolVar(&shouldDeleteOnEnd, "deleteOnEnd", shouldDeleteOnEnd, "if set all logs will be deleted upon successful parsing")
 	batchSizeFlag := flag.Int("batchSize", defaultBatchSize, "the number of metrics to insert in storage in one batch")
+	maxFilesInParallel = *flag.Int("maxFilesInParallel", defaultMaxFilesInParallel, "the number of files to process in parallel. Ex mysql allows 10 connections in parallel so makes no sense process more then 10 files in parallel")
 	flag.StringVar(&inputPath, "inputPath", "input/", "folder path where logs are located")
 	flag.Parse()
 
