@@ -9,7 +9,7 @@ import (
 	"os"
 	"strconv"
 
-	"../models"
+	"github.com/kristijorgji/docker_metrics_processor/models"
 )
 
 // MetricsRepository fetch customers from data source

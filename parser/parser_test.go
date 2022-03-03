@@ -1,11 +1,10 @@
 package parser_test
 
 import (
-	"testing"
-
-	"../models"
-	"../parser"
 	"github.com/go-test/deep"
+	"github.com/kristijorgji/docker_metrics_processor/models"
+	"github.com/kristijorgji/docker_metrics_processor/parser"
+	"testing"
 )
 
 func TestParse(t *testing.T) {

@@ -2,13 +2,12 @@ package parser
 
 import (
 	"bufio"
+	"github.com/kristijorgji/docker_metrics_processor/models"
 	"log"
 	"os"
 	"regexp"
 	"strconv"
 	"time"
-
-	"../models"
 )
 
 const mysqlDateFormat = "2006-01-02 15:04:05.000000"

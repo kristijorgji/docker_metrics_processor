@@ -11,15 +11,15 @@ import (
 	"syscall"
 	"time"
 
-	"./models"
-	"./parser"
-	"./repositories"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
+	"github.com/kristijorgji/docker_metrics_processor/models"
+	"github.com/kristijorgji/docker_metrics_processor/parser"
+	"github.com/kristijorgji/docker_metrics_processor/repositories"
 )
 
 const defaultBatchSize = 1000
-const defaultMaxFilesInParallel = 10;
+const defaultMaxFilesInParallel = 10
 
 var batchSize int
 var maxFilesInParallel int
@@ -62,8 +62,8 @@ func main() {
 			}
 			if !info.IsDir() {
 				if filesBeingProcessed >= maxFilesInParallel {
-					wg.Wait();
-					filesBeingProcessed = 0;
+					wg.Wait()
+					filesBeingProcessed = 0
 				} else {
 					filesBeingProcessed++
 				}
